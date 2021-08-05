@@ -1,0 +1,106 @@
+substitutions:
+  my_name: backgarden-sensor-aqi
+  my_location: backgarden
+
+esphome:
+  name: ${my_name}
+  platform: ESP8266
+  board: nodemcuv2
+  includes:
+    - include/aqi-c/src/aqi.h
+    - include/aqi-c/src/aqi.c
+
+logger:
+
+api:
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+uart:
+  rx_pin: D1
+  tx_pin: D2
+  baud_rate: 9600
+
+sensor:
+  - platform: sds011
+    update_interval: 1min
+    pm_2_5:
+      name: "PM 2.5 ${my_name}"
+      id: pm_2_5
+      on_value:
+        - sensor.template.publish:
+            id: aqi_2_5
+            state: !lambda |-
+              int aqi_value;
+              int err;
+
+              err = aqi_calc(AQI_TYPE_PM_2_5, id(pm_2_5).state, &aqi_value);
+              if (err != 0) {
+                ESP_LOGE("aqi", "aqi_calc(): %d", err);
+                return NAN;
+              }
+              return aqi_value;
+
+    pm_10_0:
+      name: "PM 10 ${my_name}"
+      id: pm_10_0
+      on_value:
+        - sensor.template.publish:
+            id: aqi_10_0
+            state: !lambda |-
+              int aqi_value;
+              int err;
+
+              err = aqi_calc(AQI_TYPE_PM_10_0, id(pm_10_0).state, &aqi_value);
+              if (err != 0) {
+                ESP_LOGE("aqi", "aqi_calc(): %d", err);
+                return NAN;
+              }
+              return aqi_value;
+        - sensor.template.publish:
+            id: aqi_total
+            state: !lambda |-
+              if (id(aqi_2_5).state > id(aqi_10_0).state) {
+                return id(aqi_2_5).state;
+              } else {
+                return id(aqi_10_0).state;
+              }
+        - text_sensor.template.publish:
+            id: aqi_category
+            state: !lambda |-
+              if (id(aqi_total).state <= 50) {
+                return "Good";
+              } else if (id(aqi_total).state <= 100) {
+                return "Moderate";
+              } else if (id(aqi_total).state <= 150) {
+                return "Unhealthy for Sensitive Groups";
+              } else if (id(aqi_total).state <= 200) {
+                return "Unhealthy";
+              } else if (id(aqi_total).state <= 300) {
+                return "Very Unhealthy";
+              } else {
+                return "Hazardous";
+              }
+
+  - platform: template
+    name: AQI 2.5 ${my_name}
+    id: aqi_2_5
+  - platform: template
+    name: AQI 10.0 ${my_name}
+    id: aqi_10_0
+    icon: mdi:chemical-weapon
+  - platform: template
+    name: AQI ${my_name}
+    id: aqi_total
+    icon: mdi:chemical-weapon
+
+text_sensor:
+  - platform: template
+    name: AQI category ${my_name}
+    id: aqi_category
+    icon: mdi:chemical-weapon
