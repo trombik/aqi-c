@@ -43,6 +43,11 @@ An example log:
 [14:21:48][D][text_sensor:015]: 'AQI category backgarden-sensor-aqi': Sending state 'Good'
 ```
 
+An example screenshot:
+
+![screenshot of the web server](assets/web.png)
+
+
 ## References
 
 * [Air Quality Index (AQI)](https://www.epa.gov/sites/default/files/2014-05/documents/zell-aqi.pdf)
