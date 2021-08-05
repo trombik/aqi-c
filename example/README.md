@@ -22,3 +22,8 @@ the first argument is pollutant (PM 2.5) concentration in `µg/m³`.
 > ./example 100.29
 AQI (PM 2.5): 174
 ```
+
+## Verifying the result
+
+Visit [Concentration to AQI Calculator](https://www.airnow.gov/aqi/aqi-calculator-concentration/),
+and see the result of `example`matches AQI.
