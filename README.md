@@ -22,7 +22,7 @@ cd config/include
 git clone https://github.com/trombik/aqi-c
 cd -
 ```
-Copy [`esphome-example/config/example.yaml`](esphome-example/config/example.yaml)
+Copy [`config/example.yaml`](config/example.yaml)
 to your configuration directory.
 
 Build the example:
