@@ -26,8 +26,7 @@ jobs:
       - name: Prepare
         run: |
           mkdir config
-          cp esphome-example/config/example.yaml config/
-          cp esphome-example/config/secret.yaml config/
+          cp esphome-example/config/*.yaml config/
           mkdir config/include
           cd config/include
           ln -s ../../ aqi-c
